@@ -90,5 +90,5 @@ create ltm virtual ns_epot_80_vs { destination 10.254.2.200:80 ip-protocol tcp p
 ### 4.3 Cloud Firewall
 - If Cloud Firewall is enabled, you have to add additional Virtual Servers for TCP, UDP and ICMP.
 ```
-create ltm virtual ns_all_traffic_vs { destination 0.0.0.0:any ip-protocol any profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { int_vlan } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Forward All Traffic Netskope" }
+create ltm virtual ns_all_traffic_vs { destination 0.0.0.0:any ip-protocol any profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { private } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Forward All Traffic Netskope" }
 ```
