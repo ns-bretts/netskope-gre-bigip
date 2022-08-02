@@ -71,7 +71,6 @@ create ltm pool ns_gw_pool { members replace-all-with { ns_syd1_gw:0 ns_mel1_gw:
 ## 4. Virtual Servers
 ### 4.1. Transparent Steering/Forwarding
 - To forward the traffic to Netskope NewEdge, create a Virtual Server for TCP:80 and TCP:443.
-- If Cloud Firewall is enabled, you have to add additional Virtual Servers for TCP, UDP and ICMP.
 - I recommend using a custom Fast L4 TCP profile so you can tune the TCP settings. In the example below I have disabled “SYN Cookies” as this is mutually exclusive for transparent proxy configurations.
 - Persistence (affinity/sticky sessions) is enabled using Source IP with a default timeout of 180 seconds. The persistence will we honoured across the each Virtual Server using the match-across-virtuals option.
 - Source Address and Port Address Translation is disabled.
@@ -79,12 +78,17 @@ create ltm pool ns_gw_pool { members replace-all-with { ns_syd1_gw:0 ns_mel1_gw:
 ```
 create ltm profile fastl4 ns_l4_profile { defaults-from fastL4 syn-cookie-enable disabled }
 create ltm persistence source-addr ns_source_addr { defaults-from source_addr match-across-virtuals enabled }
-create ltm virtual ns_http_80_vs { destination 0.0.0.0:80 ip-protocol tcp profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { private } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Forward HTTP to Netskope over GRE" }
-create ltm virtual ns_https_443_vs { destination 0.0.0.0:443 ip-protocol tcp profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { private } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Forward HTTPS to Netskope over GRE" }
+create ltm virtual ns_http_80_vs { destination 0.0.0.0:80 ip-protocol tcp profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { private } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Forward HTTP to Netskope" }
+create ltm virtual ns_https_443_vs { destination 0.0.0.0:443 ip-protocol tcp profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { private } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Forward HTTPS to Netskope" }
 ```
 ### 4.2. Explicit Proxy over Tunnel (EPoT)
 - The BIG-IP can also be configured to forward Explicit Proxy over Tunnel (EPoT).
 - The Virtual Server configuration is very similar to transparent steering (4.1.), using the same Fast L4 TCP profile and Persistence configuration.
 ```
-create ltm virtual ns_epot_80_vs { destination 10.254.2.200:80 ip-protocol tcp profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { private } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Netskope Explicit Proxy over GRE" }
+create ltm virtual ns_epot_80_vs { destination 10.254.2.200:80 ip-protocol tcp profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { private } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Netskope Explicit Proxy" }
+```
+### 4.3 Cloud Firewall
+- If Cloud Firewall is enabled, you have to add additional Virtual Servers for TCP, UDP and ICMP.
+```
+create ltm virtual ns_all_traffic_vs { destination 0.0.0.0:any ip-protocol any profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { int_vlan } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Forward All Traffic Netskope" }
 ```
