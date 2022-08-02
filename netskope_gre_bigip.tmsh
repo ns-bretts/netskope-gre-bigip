@@ -1,10 +1,9 @@
 ## GRE Tunnels ##
-Create a GRE tunnel configuration per Data Plane (DP). The two examples below are for SYD1 and MEL1.
+# Create a GRE tunnel configuration per Data Plane (DP). The two examples below are for SYD1 and MEL1.
 
 ## 1.1. GRE Tunnel per DP ##
-The local-address should be set to the Self IP of the egress interface on the BIG-IP. When the BIG-IP is deployed in a HA Cluster, this IP should be the Floating Self IP attached to the traffic group. If you want to learn more about DSC and Floating Self IPs, check out: DevCentral.
-
-The remote-address should be set to the Data Plane (DP) GRE Gateway IP.
+# The local-address should be set to the Self IP of the egress interface on the BIG-IP. When the BIG-IP is deployed in a Cluster, this IP should be the Floating Self IP attached to the traffic group.
+# The remote-address should be set to the Data Plane (DP) GRE Gateway IP.
 
 create net tunnels tunnel ns_syd1_gre { local-address 10.254.1.245 remote-address 163.116.192.36 profile gre description "Netskope NewEdge - SYD1" }
 create net tunnels tunnel ns_mel1_gre { local-address 10.254.1.245 remote-address 163.116.198.36 profile gre description "Netskope NewEdge - MEL1" }
