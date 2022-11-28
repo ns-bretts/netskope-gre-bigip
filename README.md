@@ -77,7 +77,7 @@ create ltm pool ns_gw_pool { members replace-all-with { ns_syd1_gw:0 ns_mel1_gw:
 - Apply the Virtual Server to the correct VLAN specific to your configuration.
 ```
 create ltm profile fastl4 ns_l4_profile { defaults-from fastL4 syn-cookie-enable disabled }
-create ltm persistence source-addr ns_source_addr { defaults-from source_addr match-across-virtuals enabled }
+create ltm persistence source-addr ns_source_addr { defaults-from source_addr match-across-virtuals enabled timeout 7200 }
 create ltm virtual ns_http_80_vs { destination 0.0.0.0:80 ip-protocol tcp profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { private } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Forward HTTP to Netskope" }
 create ltm virtual ns_https_443_vs { destination 0.0.0.0:443 ip-protocol tcp profiles replace-all-with { ns_l4_profile } vlans-enabled vlans replace-all-with { private } translate-port disabled translate-address disabled pool ns_gw_pool persist replace-all-with { ns_source_addr } description "Forward HTTPS to Netskope" }
 ```
